@@ -1,14 +1,13 @@
 import React from 'react';
 
-export const SearchField = ({onClick}) => {
+export const SearchField = ({onClick, defaultValue = ''}) => {
 
     let searchInput = ''
 
     return (
         <div>
-            { console.log('render SearchField') }
             <label>
-                Repo:<input type="text" ref={(input) => { searchInput = input }}/>
+                Repo:<input type="text" defaultValue={defaultValue} ref={(input) => { searchInput = input }}/>
             </label>
             <button onClick={() => onClick(searchInput.value)}>Find</button>
         </div>

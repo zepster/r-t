@@ -9,16 +9,19 @@ import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 import reducer from './reducers';
-import { BrowserRouter } from 'react-router-dom'
+import gitMiddleware from './middleware/git_api'
 
-const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk)));
+import createHistory from 'history/createBrowserHistory'
+import { ConnectedRouter, routerMiddleware } from 'react-router-redux'
+const history = createHistory()
 
+const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk, routerMiddleware(history), gitMiddleware)));
 
 ReactDOM.render(
     <Provider store={store}>
-        <BrowserRouter>
+        <ConnectedRouter history={history}>
             <App/>
-        </BrowserRouter>
+        </ConnectedRouter>
     </Provider>,
     document.getElementById('root')
 );

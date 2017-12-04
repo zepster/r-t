@@ -1,10 +1,10 @@
 import React from 'react';
 
-export const SearchList = ({onClick}) => {
+export const SearchList = ({repo}) => {
 
     return (
         <div>
-            <h3>List</h3>
+            <h3>{repo.name}</h3>
         </div>
     );
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { SearchList } from '../components/SearchList'
 import { connect } from 'react-redux';
 
-export class Search extends Component {
+export class Repository extends Component {
 
 
     render () {
@@ -40,4 +40,4 @@ const mapDispatchToProps = (dispatch) => {
         }
     }}
 
-export default connect(mapStateToProps, mapDispatchToProps)(Search)
+export default connect(mapStateToProps, mapDispatchToProps)(Repository)
