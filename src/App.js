@@ -5,7 +5,7 @@ import Search from './containers/Search'
 import { Route, Switch } from 'react-router-dom'
 import { push } from 'react-router-redux'
 import * as queryString from 'query-string';
-import { searchRepo as searchRepoAction} from './reducers/search'
+import { searchRepo } from './reducers/search'
 
 class App extends Component {
 
@@ -14,34 +14,38 @@ class App extends Component {
         this.onHandleClick = this.onHandleClick.bind(this);
     }
 
-    onHandleClick(value) {
+    onHandleClick(value, page = 1) {
         if (!value) return;
-        const { searchRepo } = this.props;
-        searchRepo(value);
+        const { search } = this.props;
+        search(`/search?repository=${value}&page=${page}`);
     }
 
     render() {
         return (
             <div>
-                <SearchField onClick={this.onHandleClick} defaultValue={this.props.searchParams.repository} />
+                <SearchField onClick={this.onHandleClick} defaultValue={this.props.repo} />
                 <hr/>
                 <Switch>
-                    <Route path="/search" render={props => <Search {...this.props.searchParams}/>}/>
+                    <Route path="/search" component={Search} />
                 </Switch>
             </div>
         );
   }
 }
 
+
 const mapStateToProps = state => ({
-    location: state.router.location,
-    searchParams: queryString.parse(state.router.location.search)
+    // search: state.router.location.search,
+    repo: queryString.parse(state.router.location.search).repository
 })
 
 const mapDispatchToProps  = (dispatch) => {
     return {
+        search(path) {
+            dispatch(push(path))
+        },
         searchRepo(string) {
-            dispatch(searchRepoAction(string))
+            dispatch(searchRepo(string))
         }
     }}
 

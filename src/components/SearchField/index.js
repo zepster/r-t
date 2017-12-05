@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const SearchField = ({onClick, defaultValue = ''}) => {
+export const SearchField = ({onClick, defaultValue = 'reactjs/reselect'}) => {
 
     let searchInput = ''
 

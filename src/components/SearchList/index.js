@@ -1,10 +1,53 @@
 import React from 'react';
 
-export const SearchList = ({repo}) => {
+import ReactTable  from "react-table";
+import "react-table/react-table.css";
+
+export const SearchList = ({repo, loading, total, next}) => {
 
     return (
         <div>
-            <h3>{repo.name}</h3>
+            <ReactTable
+                manual
+                showPaginationTop
+                showPaginationBottom={false}
+                data={repo}
+                loading={loading}
+                showPageSizeOptions={false}
+                pageSize={repo.length}
+                pages={total}
+                showPageJump={false}
+                onFetchData={next}
+                columns={[
+                    {
+                        columns: [
+                            {
+                                Header: "First Name",
+                                accessor: "full_name"
+                            },
+
+                        ]
+                    },
+                    {
+                        columns: [
+                            {
+                                Header: "Owner",
+                                id: "owner",
+                                accessor: d => d.owner.login
+                            }
+                        ]
+                    },
+                    {
+                        columns: [
+                            {
+                                Header: "Stars",
+                                accessor: "stargazers_count"
+                            }
+                        ]
+                    }
+                ]}
+                className="-striped -highlight"
+            />
         </div>
     );
 }

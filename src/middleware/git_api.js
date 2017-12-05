@@ -30,7 +30,7 @@ export default store => next => action => {
         })),
         error => next(actionWith({
             type: failureType,
-            error: error.message || 'Something bad happened'
+            failMsg: error.message || 'Something bad happened'
         }))
     )
 }
@@ -38,7 +38,7 @@ export default store => next => action => {
 const API_ROOT = 'https://api.github.com/'
 
 const callApi = (endpoint) => {
-    const fullUrl = API_ROOT + endpoint;
+    const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint
 
     return fetch(fullUrl)
         .then(response =>
@@ -48,10 +48,10 @@ const callApi = (endpoint) => {
                 }
 
                 const nextPageUrl = getNextPageUrl(response)
+                const prevPageUrl = getPrevPageUrl(response)
+                const totalCount = getTotalCount(response)
 
-                return Object.assign({},
-                    json,
-                    { nextPageUrl }
+                return Object.assign({}, { prevPageUrl, nextPageUrl, totalCount, items: json }
                 )
             })
         )
@@ -69,4 +69,32 @@ const getNextPageUrl = response => {
     }
 
     return nextLink.split(';')[0].slice(1, -1)
+}
+
+const getPrevPageUrl = response => {
+    const link = response.headers.get('link')
+    if (!link) {
+        return null
+    }
+
+    const prevLink = link.split(',').find(s => s.indexOf('rel="prev"') > -1)
+    if (!prevLink) {
+        return null
+    }
+
+    return prevLink.split(';')[0].slice(2, -1)
+}
+
+const getTotalCount = response => {
+    const link = response.headers.get('link')
+    if (!link) {
+        return null
+    }
+
+    const totalCount = link.split(',').find(s => s.indexOf('rel="last"') > -1)
+    if (!totalCount) {
+        return 0
+    }
+
+    return totalCount.match( /page=([0-9]*).*/)[1]
 }
