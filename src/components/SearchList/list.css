@@ -1,0 +1,7 @@
+.list {
+    border-bottom: 1px solid #ccc;
+}
+
+.list--green {
+    border-bottom: 1px solid green;
+}

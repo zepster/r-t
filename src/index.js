@@ -12,15 +12,17 @@ import reducer from './reducers';
 import gitMiddleware from './middleware/git_api'
 
 import createHistory from 'history/createBrowserHistory'
-import { ConnectedRouter, routerMiddleware } from 'react-router-redux'
-const history = createHistory()
+import { routerMiddleware, ConnectedRouter } from 'react-router-redux'
+export const history = createHistory()
 
 const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk, routerMiddleware(history), gitMiddleware)));
 
 ReactDOM.render(
     <Provider store={store}>
         <ConnectedRouter history={history}>
-            <App/>
+            <div>
+                <App/>
+            </div>
         </ConnectedRouter>
     </Provider>,
     document.getElementById('root')

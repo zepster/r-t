@@ -1,0 +1,11 @@
+.btn {
+    display: inline-block;
+}
+
+.btn--red {
+    color: red;
+}
+
+.btn--green {
+    color: green;
+}

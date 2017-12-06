@@ -1,4 +1,5 @@
 export const GIT_API = 'GIT_API_MIDDLEWARE'
+export const FAVORITE_TOKEN_NAME = 'FAVORITE_TOKEN_NAME'
 
 export default store => next => action => {
     const callAPI = action[GIT_API]
@@ -38,7 +39,7 @@ export default store => next => action => {
 const API_ROOT = 'https://api.github.com/'
 
 const callApi = (endpoint) => {
-    const fullUrl = API_ROOT + endpoint;
+    const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint
 
     return fetch(fullUrl)
         .then(response =>
@@ -47,26 +48,37 @@ const callApi = (endpoint) => {
                     return Promise.reject(json)
                 }
 
-                const nextPageUrl = getNextPageUrl(response)
+                const nextPageUrl = getPageUrl(response, 'next')
+                const prevPageUrl = getPageUrl(response, 'prev')
+                const firstPageUrl = getPageUrl(response, 'first')
+                const lastPageUrl = getPageUrl(response, 'last')
+
+                const fList = getFavoriteList()
 
                 return Object.assign({},
-                    json,
-                    { nextPageUrl }
+                    {lastPageUrl, firstPageUrl, prevPageUrl, nextPageUrl, data: json.map(v => {
+                        v.$_favorite = fList.some(f => f == v.id)
+                        return v
+                    })}
                 )
             })
         )
 }
 
-const getNextPageUrl = response => {
+const getPageUrl = (response, rel) => {
     const link = response.headers.get('link')
     if (!link) {
         return null
     }
 
-    const nextLink = link.split(',').find(s => s.indexOf('rel="next"') > -1)
-    if (!nextLink) {
+    const _link = link.split(',').find(s => s.indexOf(`rel="${rel}"`) > -1)
+    if (!_link) {
         return null
     }
+    return _link.trim().split(';')[0].slice(1, -1)
+}
 
-    return nextLink.split(';')[0].slice(1, -1)
+const getFavoriteList = () => {
+    let f = window.localStorage.getItem(FAVORITE_TOKEN_NAME)
+    return f ? JSON.parse(f) : []
 }
