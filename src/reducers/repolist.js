@@ -1,4 +1,4 @@
-import { GIT_API, FAVORITE_TOKEN_NAME } from '../middleware/git_api'
+import { GIT_API } from '../middleware/git_api'
 
 export const REPO_SEARCH = 'REPO_SEARCH'
 export const REPO_SUCCESS = 'REPO_SUCCESS'
@@ -30,23 +30,6 @@ export const fetchPage = page => dispatch => {
     return dispatch(fetchRepos(page))
 }
 
-export const toggleFavorite = id => dispatch => {
-    let storage = window.localStorage.getItem(FAVORITE_TOKEN_NAME)
-    if (!storage) {
-        storage = new Set()
-    } else {
-        storage = new Set([...JSON.parse(storage)])
-    }
-
-    if (storage.has(id)) {
-        storage.delete(id);
-    } else {
-        storage.add(id)
-    }
-    window.localStorage.setItem(FAVORITE_TOKEN_NAME, JSON.stringify(Array.from(storage)))
-    dispatch({type: TOGGLE_FAVORITE, payload: id})
-}
-
 export const reducer = (state = initialState, action) => {
     switch (action.type) {
         case REPO_SEARCH:
@@ -55,17 +38,6 @@ export const reducer = (state = initialState, action) => {
             return Object.assign({}, state, {isLoading: false, ...action.response})
         case REPO_FAIL:
             return Object.assign({}, initialState, {failMsg: action.payload})
-        case TOGGLE_FAVORITE:
-            return Object.assign(
-                {},
-                state,
-                {data: state.data.map(v => {
-                    if (v.id == action.payload) {
-                        v.$_favorite = !v.$_favorite
-                    }
-                    return v
-                } )}
-            )
         default:
             return state
     }

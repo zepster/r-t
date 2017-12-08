@@ -1,28 +1,25 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { SearchField } from './components/SearchField'
+import { Route, Switch, withRouter } from 'react-router-dom';
+
+import { navigateToSearch, } from './reducers/search'
+import SearchBar from './components/SearchBar'
 import Search from './containers/Search'
-import { Route, withRouter, Switch } from 'react-router-dom';
-import { navigateToSearch } from './reducers/search'
 
 class App extends Component {
 
     render() {
         return (
             <div>
-                <SearchField
-                    handelSearch={this.props.handelSearch}
-                />
+                <SearchBar handleSearch={this.props.handelSearch} />
                 <hr/>
                 <Switch>
-                    <Route path="/search" component={Search}/>
+                    <Route path="/search" component={Search} />
                 </Switch>
             </div>
         );
   }
 }
-
-
 
 const mapDispatchToProps = {
     handelSearch: navigateToSearch

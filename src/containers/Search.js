@@ -1,102 +1,76 @@
 import React, { Component } from 'react';
 import SearchList from '../components/SearchList'
-import Btn from '../components/Btn'
+import Nav from '../components/Nav'
 import { connect } from 'react-redux';
-import { searchRepo, fetchPage, toggleFavorite } from '../reducers/repolist';
-import ReactModal from 'react-modal';
+import { createSelector } from 'reselect';
 
-ReactModal.setAppElement('body');
+import { reposActions, getRepos } from '../reducers/repos';
 
 export class Search extends Component {
 
-    constructor () {
-        super();
-        this.state = {
-            showModal: false,
-            modalItem: {}
-        };
-
-        this.onCloseModal = this.onCloseModal.bind(this);
-        this.onOpenModal = this.onOpenModal.bind(this);
-        this.onPageChange = this.onPageChange.bind(this)
-        this.onFavorite = this.onFavorite.bind(this)
+    constructor() {
+        super(...arguments);
+        this.handlerNavClick = this.handlerNavClick.bind(this);
     }
 
     componentWillMount() {
-        this.props.searchText && this.props.searchRepo(this.props.searchText);
+        let { repository, page } = this.props;
+        repository && this.props.searchRepo(this.props.repository, page); // page
     }
 
     componentWillUpdate(nextProps) {
-        if (nextProps.searchText !== this.props.searchText) {
-            this.props.searchRepo(nextProps.searchText);
+        let { repository, page } = this.props;
+        if (nextProps.repository !== repository) {
+            return this.props.searchRepo(this.props.repository, 1);
+        } else if (nextProps.page !== page) {
+            return this.props.fetchPage(this.props.repository);
         }
     }
 
-    onPageChange(to) {
-        to && this.props.fetchPage(to)
-    }
-
-    onCloseModal () {
-        this.setState({ showModal: false, modalItem: {} });
-    }
-
-    onOpenModal (item) {
-        this.setState({ showModal: true, modalItem: item });
-    }
-
-    onFavorite () {
-        this.props.toggleFavorite(this.state.modalItem.id)
+    handlerNavClick(value) {
+        return {
+            pathname: '/search',
+            search: `?repository=${this.props.repository}&page=${value}`
+        }
     }
 
     render () {
-        let { isLoading, searchText } = this.props;
-
+        let { repos, repository, navigation } = this.props;
+        console.log("Search render!")
         return (
             <div>
-                {searchText} {isLoading && "loading..."}
+                {repository} {repos.isLoading && "loading..."}
+                {/*<Nav navigation={navigation} handlerNavClick={this.handlerNavClick}/>*/}
                 <hr />
-                <Btn title="First"
-                     link={this.props.firstPageUrl}
-                     onClick={this.onPageChange.bind(this)}
-                />
-                <Btn title="Prev" link={this.props.prevPageUrl}  onClick={this.onPageChange} />
-                <Btn title="Next" link={this.props.nextPageUrl}  onClick={this.onPageChange} />
-                <Btn title="Last" link={this.props.lastPageUrl}  onClick={this.onPageChange} />
-
-                <SearchList onSelect={this.onOpenModal}/>
-
-                <ReactModal isOpen={this.state.showModal} >
-                    <button onClick={this.onFavorite}>
-                        favorite
-                    </button>
-                    <button onClick={this.onCloseModal}>Close Modal</button>
-                    <pre>
-                        {JSON.stringify(this.state.modalItem, null, ' ')}
-                    </pre>
-
-                </ReactModal>
-
+                <SearchList items={repos.data}/>
             </div>
         )
     }
+
 }
 
-
-const mapStateToProps = (state, props) => {
-    return {
-        searchText: new URLSearchParams(props.location.search).get('repository'),
-        isLoading: state.repoList.isLoading,
-        nextPageUrl: state.repoList.nextPageUrl,
-        prevPageUrl: state.repoList.prevPageUrl,
-        firstPageUrl: state.repoList.firstPageUrl,
-        lastPageUrl: state.repoList.lastPageUrl,
+const mapStateToProps = createSelector(
+    (state, props) => new URLSearchParams(props.location.search).get('repository'), // ?
+    (state, props) => new URLSearchParams(props.location.search).get('page'),   // ?
+    getRepos,
+    (repository, page, repos) => {
+        return {
+            repository,
+            page,
+            repos,
+            // navigation: {
+            //     first: repos.firstPageUrl,
+            //     prev: repos.prevPageUrl,
+            //     next: repos.nextPageUrl,
+            //     last: repos.lastPageUrl,
+            // }
+        }
     }
-}
+);
 
 const mapDispatchToProps = {
-    searchRepo,
-    fetchPage,
-    toggleFavorite
+    searchRepo: reposActions.fetchRepos,
+    fetchPage: reposActions.fetchPage,
 }
 
 export default connect(

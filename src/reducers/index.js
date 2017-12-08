@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux'
-import {reducer as repoList} from './repolist'
+import { reposReducer } from './repos'
 
 export default combineReducers({
     router: routerReducer,
-    repoList
+    repos: reposReducer
 });
