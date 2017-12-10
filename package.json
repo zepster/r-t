@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "classnames": "^2.2.5",
+    "firebase": "^4.8.0",
     "history": "^4.7.2",
     "query-string": "^5.0.1",
     "react": "^16.2.0",

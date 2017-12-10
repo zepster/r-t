@@ -1,7 +1,37 @@
-.list {
-    border-bottom: 1px solid #ccc;
+.card-container {
+    max-width: 100%;
+    margin: 0 auto;
+    background: #ccc;
 }
 
-.list--green {
-    border-bottom: 1px solid green;
+.card {
+    display: inline-block;
+    width: 100%;
+    max-width: 200px;
+    margin: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    background: #fff;
+    box-shadow: 0 6px 10px -5px rgba(0, 0, 0, 0.2)
+}
+
+.card___image {
+    max-width: 100%;
+}
+.card__body {
+    padding: 10px;
+}
+
+.card__title {
+    font-size: 13px;
+    font-weight: 700
+}
+
+.card__fullname {
+    font-size: 10px;
+}
+
+.card__start {
+
 }

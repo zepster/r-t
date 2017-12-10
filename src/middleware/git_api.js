@@ -31,21 +31,17 @@ export default store => next => action => {
         error => next(actionWith({
             type: failureType,
             response: {
-                nextPageUrl: 'https://api.github.com/repositories/36535156/forks?page=2',
-                lastPageUrl: 'https://api.github.com/repositories/36535156/forks?page=273',
                 failMsg: error.message
             }
         }))
     )
 }
 
-const API_ROOT = 'https://api.github.com/'
+const API_ROOT = 'http://localhost:3001/find'
 
 const callApi = (endpoint) => {
-    const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint
 
-
-    return Promise.reject({message: 'my reject'})
+    const fullUrl = API_ROOT + endpoint;
 
     return fetch(fullUrl)
         .then(response =>
@@ -53,31 +49,9 @@ const callApi = (endpoint) => {
                 if (!response.ok) {
                     return Promise.reject(json)
                 }
-
-                const nextPageUrl = getPageUrl(response, 'next')
-                const prevPageUrl = getPageUrl(response, 'prev')
-                const firstPageUrl = getPageUrl(response, 'first')
-                const lastPageUrl = getPageUrl(response, 'last')
-
                 return Object.assign({},
-                    {lastPageUrl, firstPageUrl, prevPageUrl, nextPageUrl, data: json}
+                    json
                 )
             })
         )
 }
-
-const getPageUrl = (response, rel) => {
-    const link = response.headers.get('link')
-    if (!link) {
-        return null
-    }
-
-    const _link = link.split(',').find(s => s.indexOf(`rel="${rel}"`) > -1)
-    if (!_link) {
-        return null
-    }
-    return _link.trim().split(';')[0].slice(1, -1)
-}
-
-
-// const [path, nextBaseUrl, nextPage] = _link.trim().split(';')[0].slice(1, -1).match(/^(.*)\?page=(\d)*/)

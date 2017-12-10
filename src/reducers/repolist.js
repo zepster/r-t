@@ -9,7 +9,7 @@ export const initialState = {
     isLoading: false,
     failMsg: null,
     data: [],
-    nextPageUrl: null,
+    nextUrl: null,
     prevPageUrl: null,
     firstPageUrl: null,
     lastPageUrl: null,

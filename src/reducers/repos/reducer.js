@@ -4,11 +4,10 @@ export const initialState = {
     isLoading: false,
     failMsg: null,
     data: [],
-    nextPageUrl: null,
-    prevPageUrl: null,
-    firstPageUrl: null,
-    lastPageUrl: null,
-    nextBaseUrl: null,
+    firstUrl: null,
+    prevUrl: null,
+    nextUrl: null,
+    lastUrl: null,
 }
 
 export function reposReducer(state = initialState, action) {

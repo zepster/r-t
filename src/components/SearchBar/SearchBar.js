@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { searchActions } from '../../reducers/search'
 
 export class SearchBar extends React.Component {
 
@@ -10,7 +12,11 @@ export class SearchBar extends React.Component {
     handleSubmit(e) {
         e.preventDefault();
         let value = this.input.value.trim();
-        this.props.handleSearch(value)
+        this.props.query !== value && this.props.handleSearch(value)
+    }
+
+    componentWillMount() {
+        this.props.query && this.props.searchSetQuery(this.props.query)
     }
 
     render() {
@@ -28,4 +34,10 @@ export class SearchBar extends React.Component {
     }
 }
 
-export default SearchBar
+export default connect(
+    state => ({query: new URLSearchParams(state.router.location.search).get('repository')}),
+    {
+        handleSearch: searchActions.navigateToSearch,
+        searchSetQuery: searchActions.searchSetQuery,
+    }
+)(SearchBar)

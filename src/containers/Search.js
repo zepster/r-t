@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
 import { reposActions, getRepos } from '../reducers/repos';
+import { getSearch } from '../reducers/search';
+import { favoriteActions } from '../reducers/favorite';
 
 export class Search extends Component {
 
@@ -14,35 +16,50 @@ export class Search extends Component {
     }
 
     componentWillMount() {
-        let { repository, page } = this.props;
-        repository && this.props.searchRepo(this.props.repository, page); // page
+        let { repository } = this.props;
+        this.props.firebaseLoad()
+        repository && this.props.searchRepo(this.props.repository, this.getPage());
     }
 
     componentWillUpdate(nextProps) {
-        let { repository, page } = this.props;
+        let { repository } = this.props;
         if (nextProps.repository !== repository) {
-            return this.props.searchRepo(this.props.repository, 1);
-        } else if (nextProps.page !== page) {
-            return this.props.fetchPage(this.props.repository);
+            return this.props.searchRepo(nextProps.repository, 1);
         }
     }
 
-    handlerNavClick(value) {
-        return {
-            pathname: '/search',
-            search: `?repository=${this.props.repository}&page=${value}`
-        }
+    handlerNavClick(page) {
+        this.props.searchRepo(this.props.repository, page);
+    }
+
+    getPage() {
+        return new URLSearchParams(this.props.location.search).get('page') || 1
     }
 
     render () {
-        let { repos, repository, navigation } = this.props;
-        console.log("Search render!")
+        let { repos, repository } = this.props;
+        let baseUrl = `?repository=${this.props.repository}`
         return (
             <div>
-                {repository} {repos.isLoading && "loading..."}
-                {/*<Nav navigation={navigation} handlerNavClick={this.handlerNavClick}/>*/}
-                <hr />
-                <SearchList items={repos.data}/>
+                <b onClick={this.showModal}>{repository}</b> {repos.isLoading
+                ? "loading..."
+                : <div>
+                    { repos.failMsg && <p>{repos.failMsg}</p> }
+                    <Nav
+                        navigations={{
+                            first: repos.firstUrl,
+                            prev: repos.prevUrl,
+                            next: repos.nextUrl,
+                            last: repos.lastUrl,
+                        }}
+                        baseUrl={baseUrl}
+                        handlerClick={this.handlerNavClick}
+                    />
+                    <hr />
+                    <SearchList items={repos.data}/>
+                </div>
+                }
+
             </div>
         )
     }
@@ -50,27 +67,19 @@ export class Search extends Component {
 }
 
 const mapStateToProps = createSelector(
-    (state, props) => new URLSearchParams(props.location.search).get('repository'), // ?
-    (state, props) => new URLSearchParams(props.location.search).get('page'),   // ?
+    getSearch,
     getRepos,
-    (repository, page, repos) => {
+    (search, repos) => {
         return {
-            repository,
-            page,
+            repository: search.query,
             repos,
-            // navigation: {
-            //     first: repos.firstPageUrl,
-            //     prev: repos.prevPageUrl,
-            //     next: repos.nextPageUrl,
-            //     last: repos.lastPageUrl,
-            // }
         }
     }
 );
 
 const mapDispatchToProps = {
     searchRepo: reposActions.fetchRepos,
-    fetchPage: reposActions.fetchPage,
+    firebaseLoad: favoriteActions.loadFavorite
 }
 
 export default connect(
